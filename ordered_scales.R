@@ -297,26 +297,15 @@ x = "8##Albania
 915##Kosovo"
 country_codes = sapply(regmatches(x, gregexpr("([[:digit:]]+)##", x))[[1]], function(x){substr(x, 1, nchar(x)-2)}) 
 country_names = sapply(regmatches(x, gregexpr("(##[[:alnum:]\\. \\(\\)\\-]+)", x))[[1]], function(x){substr(x, 3, nchar(x))})  #load and parse the country codes
-wv6_data$country <- mapvalues(wv6_data$V2, from = country_codes, to = country_names)
-wv6_data$happiness <- mapvalues(wv6_data$V10, from = c(1,2,3,4), to = c(4,3,2,1))
 wv5_data$country <- mapvalues(wv5_data$V2, from = country_codes, to = country_names)
 wv5_data$happiness <- mapvalues(wv5_data$V10, from = c(1,2,3,4), to = c(4,3,2,1))
-happiness_data_wv6 <- wv6_data[wv6_data$happiness %in% c(1,2,3,4), c("country", "happiness")]
 happiness_data_wv5 <- wv5_data[wv5_data$happiness %in% c(1,2,3,4), c("country", "happiness")]
-happiness_data <- rbind(happiness_data_wv5, happiness_data_wv6)
-happiness_data$wave <- c(rep(5, dim(happiness_data_wv5)[1]), rep(6, dim(happiness_data_wv6)[1]))
 
 results.oprobhet_5<-oglmx(happiness ~ country, ~ country,
                           happiness_data[happiness_data$wave == 5,],
                           constantMEAN = T, constantSD = T,
                           threshparam=c(NA, 1, 2))
 summary(results.oprobhet_5)
-
-results.oprobhet_56<-oglmx(happiness ~ country, ~ country,
-                           happiness_data,
-                           constantMEAN = T, constantSD = T,
-                           threshparam=c(NA, 1, 2))
-summary(results.oprobhet_56)
 
 metrics <- happiness_data[happiness_data$wave == 5,] %>% group_by(country) %>% 
     summarize(
